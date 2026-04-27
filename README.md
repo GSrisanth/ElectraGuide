@@ -52,5 +52,3 @@ npm run dev
 
 Open [http://localhost:5173](http://localhost:5173) in your browser to view the application!
 
-## 🔒 Security Note
-The `.env` file is intentionally added to `.gitignore` to prevent your API key from being pushed to GitHub. Never commit your API key to a public repository!
