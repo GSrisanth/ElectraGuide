@@ -1,3 +1,12 @@
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  html {
+    /* Increases the base font size from 16px to 18px (112.5%),
+       scaling all text and rem-based utilities proportionally
+       to keep them aligned with each other. */
+    font-size: 112.5%; 
+  }
+}
