@@ -3,6 +3,7 @@ import { MessageCircle, X, Maximize2, Minimize2, Mic, Send, HelpCircle, Volume2,
 import { motion, AnimatePresence } from 'framer-motion';
 import { AppContext } from '../context/AppContext';
 import { TRANSLATIONS, CONTENT } from '../content';
+import { sendMessageToGemini } from '../services/gemini';
 
 export default function FloatingChat() {
   const { language } = useContext(AppContext);
@@ -104,28 +105,14 @@ export default function FloatingChat() {
     setError(null);
 
     try {
-      const sysMsg = { role: 'system', content: `You are an election assistant. Please respond to the user in ${language === 'hi' ? 'Hindi' : language === 'te' ? 'Telugu' : 'English'}.` };
-      const apiMessages = [sysMsg, ...messages, newMsg].map(m => ({ role: m.role, content: m.content }));
+      // Use the new Gemini service directly
+      const aiResponse = await sendMessageToGemini([...messages, newMsg], language);
       
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-      const response = await fetch(`${API_URL}/api/chat`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: apiMessages })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to fetch response");
-      }
-
-      const aiResponse = data.content[0].text;
       setMessages(prev => [...prev, { role: 'assistant', content: aiResponse }]);
       speakText(aiResponse);
     } catch (err) {
       console.error(err);
-      setError("Failed to reach the AI backend. Please ensure the server is running and VITE_API_URL is correct.");
+      setError(err.message || "Failed to reach the AI. Please ensure your API key is correct.");
     } finally {
       setLoading(false);
     }
